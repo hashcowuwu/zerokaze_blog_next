@@ -7,7 +7,7 @@ import { Providers } from "./providers";
 
 import { siteConfig } from "@/config/site";
 import { fontSans } from "@/config/fonts";
-import { Navbar } from "@/components/navbar";
+import TopNavbar from "@/components/Narbar";
 
 export const metadata: Metadata = {
   title: {
@@ -36,6 +36,7 @@ export default function RootLayout({
     <html suppressHydrationWarning lang="en">
       <head />
       <body>
+              <TopNavbar />
               {children}
         
       </body>

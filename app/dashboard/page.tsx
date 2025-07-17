@@ -1,61 +1,62 @@
 "use client";
-import React, { useState, useEffect } from "react";
 
+import React, { useState, useEffect } from "react";
+import useSWR from "swr";
+
+// 定义仪表盘数据接口
 interface DashboardData {
   message: string;
   userId: number;
   userName: string;
 }
 
+// 定义文章数据接口，匹配你提供的 API 响应结构
+interface Article {
+  id: number;
+  author_id: number;
+  title: string;
+  slug: string;
+  content: string;
+  created_at: string;
+  updated_at: string;
+  published: boolean;
+  published_at: string | null;
+}
+
+const dashboardFetcher = (url:string) => fetch("http://localhost:4000/dashboard", {
+          credentials: 'include'
+        }).then((res) => res.json());
+      
+
 function Dashboard() {
-  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string>("");
+  const [articles, setArticles] = useState<Article[]>([]); // 新增：文章列表状态
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const response = await fetch("http://localhost:4000/dashboard",{  credentials: 'include'}); // 浏览器会自动发送 authToken Cookie
-          
+  // Corrected: Destructure 'data' and rename it to 'dashboardData'
+  const { data: dashboardData, error, isLoading } = useSWR<DashboardData>(
+    "http://localhost:4000/dashboard",
+    dashboardFetcher
+  );
+   
+  console.log(dashboardData); // This will now correctly log your data once fetched
+  console.log("获取仪表盘数据成功");
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          setError(errorData.message || "Failed to fetch dashboard data");
-        } else {
-          const data: DashboardData = await response.json();
-          setDashboardData(data);
-        }
-      } catch (error) {
-        setError("Network error");
-      } finally {
-        setLoading(false);
-      }
-    };
 
-    fetchDashboardData();
-  }, []);
-
-  if (loading) {
-    return <div className="text-center">Loading dashboard data...</div>;
-  }
-
-  if (error) {
-    return <div className="text-red-500 text-center">{error}</div>;
-  }
-
+  if (isLoading) return <div className="text-center text-xl">Loading dashboard...</div>;
+  if (error) return <div className="text-center text-xl text-red-500">Failed to load dashboard: {error.message}</div>;
+  if (!dashboardData) return null; // Data not yet loaded, return null to prevent rendering with undefined data
+  
   return (
-    <div className="h-screen bg-gray-100 flex items-center justify-center">
-      <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 w-96">
-        <div className="text-center text-2xl font-semibold text-gray-800 mb-6">
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
+      {/* 仪表盘部分 */}
+      <div className="bg-white shadow-lg rounded-lg px-8 pt-6 pb-8 w-full max-w-md mb-8">
+        <div className="text-center text-2xl font-bold text-gray-800 mb-6">
           Dashboard
         </div>
-        {dashboardData && (
-          <div className="mb-4">
-            <p>Welcome, {dashboardData.userName}!</p>
-            <p>User ID: {dashboardData.userId}</p>
-            <p>{dashboardData.message}</p>
+          <div className="space-y-3 text-gray-700">
+            <p className="text-lg">Welcome back, <span className="font-semibold">{dashboardData.userName}</span>!</p>
+            <p><strong>User ID:</strong> {dashboardData.userId}</p>
+            <p><strong>Server Message:</strong> {dashboardData.message}</p>
           </div>
-        )}
       </div>
     </div>
   );
