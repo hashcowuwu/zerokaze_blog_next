@@ -1,4 +1,5 @@
 import "@/styles/globals.css";
+
 import { Metadata, Viewport } from "next";
 import { Link } from "@heroui/link";
 import clsx from "clsx";
@@ -36,8 +37,11 @@ export default function RootLayout({
     <html suppressHydrationWarning lang="en">
       <head />
       <body>
-              <TopNavbar />
+        <Providers>
+           <TopNavbar />
               {children}
+        </Providers>
+             
         
       </body>
     </html>

@@ -34,7 +34,8 @@ function Dashboard() {
   // Corrected: Destructure 'data' and rename it to 'dashboardData'
   const { data: dashboardData, error, isLoading } = useSWR<DashboardData>(
     "http://localhost:4000/dashboard",
-    dashboardFetcher
+    dashboardFetcher,
+
   );
    
   console.log(dashboardData); // This will now correctly log your data once fetched
